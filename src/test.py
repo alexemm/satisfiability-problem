@@ -1,4 +1,6 @@
-from resolution_calculus import load_json, create_clause_set, decide_unsat
+from resolution_calculus import load_json, decide_unsat
+
+from cnf_formula import create_clause_set
 
 import os
 
