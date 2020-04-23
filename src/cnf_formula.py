@@ -178,12 +178,22 @@ class HornFormulaSet(CNFClauseSet):
         """
         return set([clause for clause in self.clause_set if clause.just_negative()])
 
+    def get_horn_formula(self):
+        type1 = " ∧ ".join(['(1 -> %s)' % clause.literals.copy().pop() for clause in self.get_right_side_given()])
+        type2 = " ∧ ".join(['((%s)-> %s)' % (
+            " ∧ ".join(map(lambda x: str(-x), clause.get_negative_literals())),
+            str(clause.get_positive_literals().copy().pop())) for
+                            clause in self.get_one_positve_many_negative()])
+        type3 = " ∧ ".join(
+            ['((%s) -> 0)' % " ∧ ".join(map(lambda x: str(-x), clause.get_negative_literals())) for clause in
+             self.get_just_negative()])
+        return ' ∧ '.join([i for i in [type1, type2, type3]])
+
 
 def create_literal(literal: str) -> Literal:
     positive = not literal.startswith('-')
     if not positive:
         literal = literal[1:]
-    # import  pdb; pdb.set_trace()
     return Literal(Variable(literal), positive)
 
 

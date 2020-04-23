@@ -21,11 +21,11 @@ def test_horn_sat():
     test_cases = [load_json('%s/%s' % (directory, file)) for file in os.listdir(directory)]
     for i, test_case in enumerate(test_cases):
         print("Test: %i" % (i + 1))
-        print('formula: ' + HornFormulaSet(create_clause_set(test_case['clause_set'], horn=True)).get_formula())
+        print('formula: ' + HornFormulaSet(create_clause_set(test_case['clause_set'], horn=True)).get_horn_formula())
         result = marker_algorithm(HornFormulaSet(create_clause_set(test_case['clause_set'], horn=True)))
         assert test_case['horn_sat'] == (result is not None)
         if result is not None:
-            print([str(literal) for literal in result])
+            print('Minimal Model: ' + str([str(literal) for literal in result]))
 
 
 if __name__ == "__main__":
