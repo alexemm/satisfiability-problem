@@ -55,6 +55,9 @@ class Clause:
                     return True
         return False
 
+    def is_horn_clause(self):
+        return sum([int(literal.positive) for literal in self.literals]) <= 1
+
     def __eq__(self, other):
         if not isinstance(other, type(self)):
             return NotImplemented
@@ -81,6 +84,19 @@ class Clause:
 
     def __sub__(self, other):
         return self.difference(other)
+
+
+class CNFClauseSet:
+
+    def __init__(self, clause_set: Set[Clause]):
+        self.clause_set = clause_set
+
+    def is_horn_formula(self):
+        return all([clause.is_horn_clause() for clause in self.clause_set])
+
+    def get_formula(self):
+        return ' ∧ '.join(
+            [str(clause).replace('{', '(').replace('}', ')').replace(',', ' ∨ ') for clause in self.clause_set])
 
 
 def create_literal(literal: str) -> Literal:
