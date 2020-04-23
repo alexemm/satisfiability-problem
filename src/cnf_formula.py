@@ -58,6 +58,10 @@ class Clause:
     def is_horn_clause(self):
         return sum([int(literal.positive) for literal in self.literals]) <= 1
 
+    def get_horn_clause(self):
+        if self.is_horn_clause():
+            return HornClause(self.literals)
+
     def __eq__(self, other):
         if not isinstance(other, type(self)):
             return NotImplemented
@@ -85,6 +89,53 @@ class Clause:
     def __sub__(self, other):
         return self.difference(other)
 
+    def __len__(self):
+        return len(self.literals)
+
+    def right_side_given(self):
+        raise NotImplemented
+
+    def one_positive_many_negative(self):
+        raise NotImplemented
+
+    def just_negative(self):
+        raise NotImplemented
+
+    def get_positive_literals(self):
+        return set([literal for literal in self.literals if literal.positive])
+
+    def get_negative_literals(self):
+        return set([literal for literal in self.literals if not literal.positive])
+
+
+class HornClause(Clause):
+
+    def __init__(self, literals: Set[Literal]):
+        super().__init__(literals)
+        if not self.is_horn_clause():
+            raise Exception
+
+    def right_side_given(self):
+        """
+        Evaluates, if this formula is in the form of (1 -> X)
+        :return:
+        """
+        return len(self) == 1 and self.literals.copy().pop().positive
+
+    def one_positive_many_negative(self):
+        """
+        Evaluates, if this formula is in the form of ((X_1 and ... and X_k) -> X)
+        :return:
+        """
+        return len(self) != 1 and any([literal.positive for literal in self.literals])
+
+    def just_negative(self):
+        """
+        Evaluates, if this formula is in the form of ((X_1 and ... and X_k) -> 0)
+        :return:
+        """
+        return all([not literal.positive for literal in self.literals])
+
 
 class CNFClauseSet:
 
@@ -99,6 +150,35 @@ class CNFClauseSet:
             [str(clause).replace('{', '(').replace('}', ')').replace(',', ' ∨ ') for clause in self.clause_set])
 
 
+class HornFormulaSet(CNFClauseSet):
+
+    def __init__(self, clause_set: Set[HornClause]):
+        super().__init__(clause_set)
+        if not self.is_horn_formula():
+            raise Exception
+
+    def get_right_side_given(self):
+        """
+        Returns clauses in the form (1 -> X)
+        :return:
+        """
+        return set([clause for clause in self.clause_set if clause.right_side_given()])
+
+    def get_one_positve_many_negative(self):
+        """
+        Returns clauses in the form of ((X_1 and ... and X_k) -> X)
+        :return:
+        """
+        return set([clause for clause in self.clause_set if clause.one_positive_many_negative()])
+
+    def get_just_negative(self):
+        """
+        Returns clauses in the form of ((X_1 and ... and X_k) -> 0)
+        :return:
+        """
+        return set([clause for clause in self.clause_set if clause.just_negative()])
+
+
 def create_literal(literal: str) -> Literal:
     positive = not literal.startswith('-')
     if not positive:
@@ -107,10 +187,13 @@ def create_literal(literal: str) -> Literal:
     return Literal(Variable(literal), positive)
 
 
-def create_clause_set(clauses) -> Set[Clause]:
+def create_clause_set(clauses, horn=False) -> Set[Clause]:
     ret = set()
     for clause in clauses:
-        ret.add(Clause(set(map(create_literal, clause))))
+        if horn:
+            ret.add(HornClause(set(map(create_literal, clause))))
+        else:
+            ret.add(Clause(set(map(create_literal, clause))))
     return ret
 
 
