@@ -15,7 +15,7 @@ def Res(K: Set[Clause]) -> Set[Clause]:
                     resolute = (K_list[i] | K_list[j]) - Clause({literal, -literal})
                     if not resolute.is_tautology():
                         res.add(resolute)
-                    break
+                        break
     return K | res
 
 
