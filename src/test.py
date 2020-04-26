@@ -4,6 +4,9 @@ from cnf_formula import create_clause_set, CNFClauseSet, HornFormulaSet
 
 import os
 
+# TODO: Change directory of this file to root
+# TODO: Simplify code, so test cases are easier to read
+
 
 def test_unsat():
     directory = "test/unsat"
