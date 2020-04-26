@@ -6,7 +6,6 @@ from typing import Set, Iterable
 # TODO: Add method for implemented algorithms inside classes (just import from the modules)
 # TODO: change order of defined methods
 # TODO: Set get_formula methods
-# TODO: Implement __str__ of CNFClauseSet
 # TODO: Check for right abstraction of classes (check in methods which have no type hint)
 
 class Variable:
@@ -46,7 +45,7 @@ class Literal:
         return self.variable == other.variable and self.positive == other.positive
 
     def __hash__(self):
-        return hash((self.variable, self.positive))
+        return hash(str(self.variable) + str(self.positive))
 
     def __str__(self):
         pre = ""
@@ -91,7 +90,7 @@ class CNFClause:
         return self.literals == other.literals
 
     def __hash__(self):
-        return hash(str(self.literals))
+        return hash(frozenset(self.literals))
 
     def __str__(self):
         return '{' + ','.join([str(literal) for literal in self.literals]) + '}'
@@ -236,9 +235,11 @@ class CNFClauseSet:
         return ' ∧ '.join(
             [str(clause).replace('{', '(').replace('}', ')').replace(',', ' ∨ ') for clause in self.clause_set])
 
+    def __len__(self):
+        return len(self.clause_set)
+
     def __str__(self):
-        # TODO
-        raise NotImplemented
+        return '{' + ','. join((map(str, self.clause_set))) + '}'
 
 
 class HornFormulaSet(CNFClauseSet):
