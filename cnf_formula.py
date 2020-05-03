@@ -214,9 +214,11 @@ class HornClause(CNFClause):
         left_side: str = "1"
         negative_literals: Set[Literal] = self.get_negative_literals()
         if len(negative_literals) > 0:
-            left_side: str = ' ∨ '.join([str(literal.variable) for literal in negative_literals])
+            left_side: str = ' ∧ '.join([str(literal.variable) for literal in negative_literals])
+        if len(negative_literals) > 1:
+            left_side = "(%s)" % left_side
         # Assemble
-        return "(%s) → %s" % (left_side, right_side)
+        return "%s → %s" % (left_side, right_side)
 
 
 class CNFClauseSet:
@@ -239,7 +241,6 @@ class CNFClauseSet:
         Returns the String of formula which is represented by this set of clauses.
         :return: String of formula in CNF.
         """
-        # TODO: Refactor (make use of get_formula method of CNFClause)
         return ' ∧ '.join(["(%s)" % clause.get_formula() for clause in self.clause_set])
 
     def __len__(self):
