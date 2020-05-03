@@ -69,6 +69,7 @@ class CNFClause:
         Returns, whether all fitting interpretations of this Clause are model of it
         :return: boolean, whether this formula is a tautology, or not
         """
+        # TODO: Try to make use of any and list comp
         literals = list(self.literals)
         for i in range(len(self.literals) - 1):
             for j in range(i + 1, len(self.literals)):
@@ -288,8 +289,7 @@ def create_literal(literal: str) -> Literal:
     :param literal: String of literal
     :return: Literal
     """
-    # TODO: Cut literal string in the left ('  A' to 'A')
-    positive = not literal.startswith('-')
+    positive = not literal.lstrip().startswith('-')
     if not positive:
         literal = literal[1:]
     return Literal(Variable(literal), positive)
