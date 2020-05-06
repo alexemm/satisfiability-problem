@@ -2,8 +2,6 @@ from typing import Set
 
 from cnf_formula import CNFClause
 
-import json
-
 
 def Res(K: Set[CNFClause]) -> Set[CNFClause]:
     """
@@ -38,15 +36,3 @@ def decide_unsat(K: Set[CNFClause]) -> bool:
         if CNFClause(set()) in S:
             return True
     return False
-
-
-def load_json(file: str):
-    """
-    Loads json file and returns list of list
-    :param file: Path to file to load
-    :return: List of lists from loaded JSON
-    """
-    # TODO: Put it into cnf_formula.py
-    with open(file) as f:
-        ret = json.load(f)
-    return ret

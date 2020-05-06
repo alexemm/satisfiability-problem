@@ -1,3 +1,4 @@
+import json
 from typing import Set, Iterable
 
 
@@ -312,11 +313,12 @@ def create_clause_set(clauses: Iterable[str], horn: bool = False) -> Set[CNFClau
     return ret
 
 
-def print_set(S):
+def load_json(file: str):
     """
-    Prints clause sets
-    :param S:
-    :return:
+    Loads json file and returns list of list
+    :param file: Path to file to load
+    :return: List of lists from loaded JSON
     """
-    # TODO: Reconsider, if needed after implementing string methods of classes
-    print([str(i) for i in S])
+    with open(file) as f:
+        ret = json.load(f)
+    return ret
