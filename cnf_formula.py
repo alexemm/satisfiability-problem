@@ -70,13 +70,7 @@ class CNFClause:
         Returns, whether all fitting interpretations of this Clause are model of it
         :return: boolean, whether this formula is a tautology, or not
         """
-        # TODO: Try to make use of any and list comp
-        literals = list(self.literals)
-        for i in range(len(self.literals) - 1):
-            for j in range(i + 1, len(self.literals)):
-                if literals[i] == - literals[j]:
-                    return True
-        return False
+        return any([- literal in self.literals for literal in self.literals])
 
     def is_horn_clause(self) -> bool:
         """
