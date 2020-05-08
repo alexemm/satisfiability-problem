@@ -1,69 +1,18 @@
 import json
 from typing import Set, Iterable
+from formula import Literal, Variable, Clause, ClauseSet
 
 
-# TODO: Refactor code for proper styling
-# TODO: Add Abstract class for clause
-# TODO: Add method for implemented algorithms inside classes (just import from the modules)
-# TODO: change order of defined methods
 # TODO: Check for right abstraction of classes (check in methods which have no type hint)
 
-class Variable:
-    """
-    Class which just represents a unique Variable with its name. Objects of it are hashable, and therefore usable in a
-    set.
-    """
 
-    def __init__(self, name: str):
-        self.name = name
-
-    def __eq__(self, other):
-        if not isinstance(other, type(self)):
-            return NotImplemented
-        return self.name == other.name
-
-    def __hash__(self):
-        return hash(self.name)
-
-    def __str__(self):
-        return self.name
-
-
-class Literal:
-    """
-    This class represents a literal in e.g. a boolean formula in CNF. A literal is a Variable, which can be either
-    positive or negative.
-    """
-
-    def __init__(self, variable: Variable, postive: bool):
-        self.variable = variable
-        self.positive = postive
-
-    def __eq__(self, other):
-        if not isinstance(other, type(self)):
-            return NotImplemented
-        return self.variable == other.variable and self.positive == other.positive
-
-    def __hash__(self):
-        return hash(str(self.variable) + str(self.positive))
-
-    def __str__(self):
-        pre = ""
-        if not self.positive:
-            pre = "¬"
-        return "%s%s" % (pre, str(self.variable))
-
-    def __neg__(self):
-        return Literal(self.variable, not self.positive)
-
-
-class CNFClause:
+class CNFClause(Clause):
     """
     This class represents a Clause which is a set of literals. This
     """
 
     def __init__(self, literals: Set[Literal]):
-        self.literals = literals
+        super().__init__(literals)
 
     def is_tautology(self) -> bool:
         """
@@ -78,17 +27,6 @@ class CNFClause:
         :return: boolean, whether this clause is a Horn Clause
         """
         return sum([int(literal.positive) for literal in self.literals]) <= 1
-
-    def __eq__(self, other):
-        if not isinstance(other, type(self)):
-            return NotImplemented
-        return self.literals == other.literals
-
-    def __hash__(self):
-        return hash(frozenset(self.literals))
-
-    def __str__(self):
-        return '{' + ','.join([str(literal) for literal in self.literals]) + '}'
 
     def union(self, other: 'CNFClause') -> 'CNFClause':
         """
@@ -110,15 +48,6 @@ class CNFClause:
         if not isinstance(other, type(self)):
             return NotImplemented
         return CNFClause(self.literals - other.literals)
-
-    def __or__(self, other):
-        return self.union(other)
-
-    def __sub__(self, other):
-        return self.difference(other)
-
-    def __len__(self):
-        return len(self.literals)
 
     def right_side_given(self):
         """
@@ -161,6 +90,12 @@ class CNFClause:
         :return: string of formula
         """
         return ' ∨ '.join([str(literal) for literal in self.literals])
+
+    def __or__(self, other):
+        return self.union(other)
+
+    def __sub__(self, other):
+        return self.difference(other)
 
 
 class HornClause(CNFClause):
@@ -217,13 +152,13 @@ class HornClause(CNFClause):
         return "%s → %s" % (left_side, right_side)
 
 
-class CNFClauseSet:
+class CNFClauseSet(ClauseSet):
     """
     Class which represents sets of clauses in CNF
     """
 
     def __init__(self, clause_set: Set[CNFClause]):
-        self.clause_set = clause_set
+        super().__init__(clause_set)
 
     def is_horn_formula(self) -> bool:
         """
@@ -238,12 +173,6 @@ class CNFClauseSet:
         :return: String of formula in CNF.
         """
         return ' ∧ '.join(["(%s)" % clause.get_formula() for clause in self.clause_set])
-
-    def __len__(self):
-        return len(self.clause_set)
-
-    def __str__(self):
-        return '{' + ','. join((map(str, self.clause_set))) + '}'
 
 
 class HornFormulaSet(CNFClauseSet):
