@@ -1,6 +1,6 @@
 from typing import Set
 
-from cnf_formula import CNFClause
+from propositional_calculus.cnf_formula import CNFClause
 
 
 def Res(K: Set[CNFClause]) -> Set[CNFClause]:

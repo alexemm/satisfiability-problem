@@ -1,6 +1,6 @@
 import json
 from typing import Set, Iterable, List
-from formula import Literal, Variable, Clause, ClauseSet
+from propositional_calculus.formula import Literal, Variable, Clause, ClauseSet
 
 
 class CNFClause(Clause):

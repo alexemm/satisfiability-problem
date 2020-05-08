@@ -1,6 +1,6 @@
-from resolution_calculus import decide_unsat
-from horn_sat import marker_algorithm
-from cnf_formula import create_clause_set, CNFClauseSet, HornFormulaSet, load_json
+from propositional_calculus.resolution_calculus import decide_unsat
+from propositional_calculus.horn_sat import marker_algorithm
+from propositional_calculus.cnf_formula import create_clause_set, CNFClauseSet, HornFormulaSet, load_json
 
 import os
 

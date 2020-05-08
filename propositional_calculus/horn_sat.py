@@ -1,6 +1,6 @@
 from typing import Set, Optional
 
-from cnf_formula import HornFormulaSet, Variable
+from propositional_calculus.cnf_formula import HornFormulaSet, Variable
 
 
 def marker_algorithm(psi: HornFormulaSet) -> Optional[Set[Variable]]:

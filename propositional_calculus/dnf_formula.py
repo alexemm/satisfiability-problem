@@ -1,6 +1,6 @@
 from typing import Set
 
-from formula import Clause, Literal, ClauseSet
+from propositional_calculus.formula import Clause, Literal, ClauseSet
 
 
 class DNFClause(Clause):
