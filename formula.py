@@ -72,6 +72,12 @@ class Clause:
     def __len__(self) -> int:
         return len(self.literals)
 
+    def is_horn_clause(self):
+        raise NotImplemented
+
+    def get_formula(self):
+        raise NotImplemented
+
 
 class ClauseSet:
     """

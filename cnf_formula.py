@@ -5,7 +5,7 @@ from formula import Literal, Variable, Clause, ClauseSet
 
 class CNFClause(Clause):
     """
-    This class represents a Clause which is a set of literals. This
+    This class represents a Clause which is a set of literals.
     """
 
     def __init__(self, literals: Set[Literal]) -> None:
