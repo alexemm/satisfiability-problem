@@ -1,9 +1,6 @@
 import json
-from typing import Set, Iterable
+from typing import Set, Iterable, List
 from formula import Literal, Variable, Clause, ClauseSet
-
-
-# TODO: Check for right abstraction of classes (check in methods which have no type hint)
 
 
 class CNFClause(Clause):
@@ -11,7 +8,7 @@ class CNFClause(Clause):
     This class represents a Clause which is a set of literals. This
     """
 
-    def __init__(self, literals: Set[Literal]):
+    def __init__(self, literals: Set[Literal]) -> None:
         super().__init__(literals)
 
     def is_tautology(self) -> bool:
@@ -38,7 +35,7 @@ class CNFClause(Clause):
             return NotImplemented
         return CNFClause(self.literals.union(other.literals))
 
-    def difference(self, other) -> 'CNFClause':
+    def difference(self, other: 'CNFClause') -> 'CNFClause':
         """
         Returns the difference between this clause and the other clause which was given. The result is the Clause with
         elements of the first clause without the elements of the second clause.
@@ -49,21 +46,21 @@ class CNFClause(Clause):
             return NotImplemented
         return CNFClause(self.literals - other.literals)
 
-    def right_side_given(self):
+    def right_side_given(self) -> None:
         """
         Is not implemented, because it refers to Horn clauses
         :return: None, but a NotImplemented is raised
         """
         raise NotImplemented
 
-    def one_positive_many_negative(self):
+    def one_positive_many_negative(self) -> None:
         """
         Is not implemented, because it refers to Horn clauses
         :return: None, but a NotImplemented is raised
         """
         raise NotImplemented
 
-    def just_negative(self):
+    def just_negative(self) -> None:
         """
         Is not implemented, because it refers to Horn clauses
         :return: None, but a NotImplemented is raised
@@ -91,10 +88,10 @@ class CNFClause(Clause):
         """
         return ' ∨ '.join([str(literal) for literal in self.literals])
 
-    def __or__(self, other):
+    def __or__(self, other: 'CNFClause') -> 'CNFClause':
         return self.union(other)
 
-    def __sub__(self, other):
+    def __sub__(self, other: 'CNFClause') -> 'CNFClause':
         return self.difference(other)
 
 
@@ -104,7 +101,7 @@ class HornClause(CNFClause):
     literal at max.
     """
 
-    def __init__(self, literals: Set[Literal]):
+    def __init__(self, literals: Set[Literal]) -> None:
         super().__init__(literals)
         if not self.is_horn_clause():
             raise Exception
@@ -147,7 +144,7 @@ class HornClause(CNFClause):
         if len(negative_literals) > 0:
             left_side: str = ' ∧ '.join([str(literal.variable) for literal in negative_literals])
         if len(negative_literals) > 1:
-            left_side = "(%s)" % left_side
+            left_side: str = "(%s)" % left_side
         # Assemble
         return "%s → %s" % (left_side, right_side)
 
@@ -157,7 +154,7 @@ class CNFClauseSet(ClauseSet):
     Class which represents sets of clauses in CNF
     """
 
-    def __init__(self, clause_set: Set[CNFClause]):
+    def __init__(self, clause_set: Set[CNFClause]) -> None:
         super().__init__(clause_set)
 
     def is_horn_formula(self) -> bool:
@@ -180,26 +177,26 @@ class HornFormulaSet(CNFClauseSet):
     Class which consists of clause set which represents Horn Formulas.
     """
 
-    def __init__(self, clause_set: Set[HornClause]):
+    def __init__(self, clause_set: Set[HornClause]) -> None:
         super().__init__(clause_set)
         if not self.is_horn_formula():
             raise Exception
 
-    def get_right_side_given(self):
+    def get_right_side_given(self) -> Set[Clause]:
         """
         Returns clauses in the form (1 -> X)
         :return: Horn Clauses of type 1 (1 -> X)
         """
         return set([clause for clause in self.clause_set if clause.right_side_given()])
 
-    def get_one_positve_many_negative(self):
+    def get_one_positve_many_negative(self) -> Set[Clause]:
         """
         Returns clauses in the form of ((X_1 and ... and X_k) -> X)
         :return: Horn Clauses of type 2 ((X_1 and ... and X_k) -> X)
         """
         return set([clause for clause in self.clause_set if clause.one_positive_many_negative()])
 
-    def get_just_negative(self):
+    def get_just_negative(self) -> Set[Clause]:
         """
         Returns clauses in the form of ((X_1 and ... and X_k) -> 0)
         :return: Horn Clauses of type 3 ((X_1 and ... and X_k) -> 0)
@@ -213,9 +210,9 @@ def create_literal(literal: str) -> Literal:
     :param literal: String of literal
     :return: Literal
     """
-    positive = not literal.lstrip().startswith('-')
+    positive: bool = not literal.lstrip().startswith('-')
     if not positive:
-        literal = literal[1:]
+        literal: str = literal[1:]
     return Literal(Variable(literal), positive)
 
 
@@ -227,7 +224,7 @@ def create_clause_set(clauses: Iterable[str], horn: bool = False) -> Set[CNFClau
     :return: Set of clauses
     """
     # TODO: Maybe change return type to CNFClauseSet? (also change the doc then!)
-    ret = set()
+    ret: Set[Clause] = set()
     for clause in clauses:
         if horn:
             ret.add(HornClause(set(map(create_literal, clause))))
@@ -236,12 +233,12 @@ def create_clause_set(clauses: Iterable[str], horn: bool = False) -> Set[CNFClau
     return ret
 
 
-def load_json(file: str):
+def load_json(file: str) -> List[List[str]]:
     """
     Loads json file and returns list of list
     :param file: Path to file to load
     :return: List of lists from loaded JSON
     """
     with open(file) as f:
-        ret = json.load(f)
+        ret: List[List[str]] = json.load(f)
     return ret
