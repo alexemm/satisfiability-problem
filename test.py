@@ -1,10 +1,9 @@
-from resolution_calculus import load_json, decide_unsat
+from resolution_calculus import decide_unsat
 from horn_sat import marker_algorithm
-from cnf_formula import create_clause_set, CNFClauseSet, HornFormulaSet
+from cnf_formula import create_clause_set, CNFClauseSet, HornFormulaSet, load_json
 
 import os
 
-# TODO: Change directory of this file to root
 # TODO: Simplify code, so test cases are easier to read
 
 
@@ -24,7 +23,7 @@ def test_horn_sat():
     test_cases = [load_json('%s/%s' % (directory, file)) for file in os.listdir(directory)]
     for i, test_case in enumerate(test_cases):
         print("Test: %i" % (i + 1))
-        print('formula: ' + HornFormulaSet(create_clause_set(test_case['clause_set'], horn=True)).get_horn_formula())
+        print('formula: ' + HornFormulaSet(create_clause_set(test_case['clause_set'], horn=True)).get_formula())
         result = marker_algorithm(HornFormulaSet(create_clause_set(test_case['clause_set'], horn=True)))
         assert test_case['horn_sat'] == (result is not None)
         if result is not None:

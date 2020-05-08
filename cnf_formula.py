@@ -1,3 +1,4 @@
+import json
 from typing import Set, Iterable
 
 
@@ -5,8 +6,6 @@ from typing import Set, Iterable
 # TODO: Add Abstract class for clause
 # TODO: Add method for implemented algorithms inside classes (just import from the modules)
 # TODO: change order of defined methods
-# TODO: Set get_formula methods
-# TODO: Implement __str__ of CNFClauseSet
 # TODO: Check for right abstraction of classes (check in methods which have no type hint)
 
 class Variable:
@@ -46,7 +45,7 @@ class Literal:
         return self.variable == other.variable and self.positive == other.positive
 
     def __hash__(self):
-        return hash((self.variable, self.positive))
+        return hash(str(self.variable) + str(self.positive))
 
     def __str__(self):
         pre = ""
@@ -71,12 +70,7 @@ class CNFClause:
         Returns, whether all fitting interpretations of this Clause are model of it
         :return: boolean, whether this formula is a tautology, or not
         """
-        literals = list(self.literals)
-        for i in range(len(self.literals) - 1):
-            for j in range(i + 1, len(self.literals)):
-                if literals[i] == - literals[j]:
-                    return True
-        return False
+        return any([- literal in self.literals for literal in self.literals])
 
     def is_horn_clause(self) -> bool:
         """
@@ -91,7 +85,7 @@ class CNFClause:
         return self.literals == other.literals
 
     def __hash__(self):
-        return hash(str(self.literals))
+        return hash(frozenset(self.literals))
 
     def __str__(self):
         return '{' + ','.join([str(literal) for literal in self.literals]) + '}'
@@ -166,8 +160,7 @@ class CNFClause:
         Returns string of formula which is a disjunction of literals
         :return: string of formula
         """
-        # TODO: Implement
-        raise NotImplemented
+        return ' ∨ '.join([str(literal) for literal in self.literals])
 
 
 class HornClause(CNFClause):
@@ -208,8 +201,20 @@ class HornClause(CNFClause):
         implicates positive literals)
         :return:
         """
-        # TODO: Implement
-        raise NotImplemented
+        # Get right side
+        right_side: str = "0"
+        positive_literals: Set[Literal] = self.get_positive_literals()
+        if len(positive_literals) == 1:
+            right_side: str = "%s" % str(positive_literals.copy().pop().variable)
+        # Get left side
+        left_side: str = "1"
+        negative_literals: Set[Literal] = self.get_negative_literals()
+        if len(negative_literals) > 0:
+            left_side: str = ' ∧ '.join([str(literal.variable) for literal in negative_literals])
+        if len(negative_literals) > 1:
+            left_side = "(%s)" % left_side
+        # Assemble
+        return "%s → %s" % (left_side, right_side)
 
 
 class CNFClauseSet:
@@ -232,13 +237,13 @@ class CNFClauseSet:
         Returns the String of formula which is represented by this set of clauses.
         :return: String of formula in CNF.
         """
-        # TODO: Refactor (make use of get_formula method of CNFClause)
-        return ' ∧ '.join(
-            [str(clause).replace('{', '(').replace('}', ')').replace(',', ' ∨ ') for clause in self.clause_set])
+        return ' ∧ '.join(["(%s)" % clause.get_formula() for clause in self.clause_set])
+
+    def __len__(self):
+        return len(self.clause_set)
 
     def __str__(self):
-        # TODO
-        raise NotImplemented
+        return '{' + ','. join((map(str, self.clause_set))) + '}'
 
 
 class HornFormulaSet(CNFClauseSet):
@@ -272,22 +277,6 @@ class HornFormulaSet(CNFClauseSet):
         """
         return set([clause for clause in self.clause_set if clause.just_negative()])
 
-    def get_horn_formula(self) -> str:
-        """
-        Returns the clause set as a Horn Formula represented as a string.
-        :return: String of Horn Formula
-        """
-        # TODO: Refactor (use get_formula method from HornClauses)
-        type1 = " ∧ ".join(['(1 -> %s)' % clause.literals.copy().pop() for clause in self.get_right_side_given()])
-        type2 = " ∧ ".join(['((%s)-> %s)' % (
-            " ∧ ".join(map(lambda x: str(-x), clause.get_negative_literals())),
-            str(clause.get_positive_literals().copy().pop())) for
-                            clause in self.get_one_positve_many_negative()])
-        type3 = " ∧ ".join(
-            ['((%s) -> 0)' % " ∧ ".join(map(lambda x: str(-x), clause.get_negative_literals())) for clause in
-             self.get_just_negative()])
-        return ' ∧ '.join([i for i in [type1, type2, type3]])
-
 
 def create_literal(literal: str) -> Literal:
     """
@@ -295,8 +284,7 @@ def create_literal(literal: str) -> Literal:
     :param literal: String of literal
     :return: Literal
     """
-    # TODO: Cut literal string in the left ('  A' to 'A')
-    positive = not literal.startswith('-')
+    positive = not literal.lstrip().startswith('-')
     if not positive:
         literal = literal[1:]
     return Literal(Variable(literal), positive)
@@ -319,11 +307,12 @@ def create_clause_set(clauses: Iterable[str], horn: bool = False) -> Set[CNFClau
     return ret
 
 
-def print_set(S):
+def load_json(file: str):
     """
-    Prints clause sets
-    :param S:
-    :return:
+    Loads json file and returns list of list
+    :param file: Path to file to load
+    :return: List of lists from loaded JSON
     """
-    # TODO: Reconsider, if needed after implementing string methods of classes
-    print([str(i) for i in S])
+    with open(file) as f:
+        ret = json.load(f)
+    return ret

@@ -1,6 +1,7 @@
 from itertools import product
 from functools import reduce
 
+
 class Formula:
 
     def __init__(self, formula: str):
@@ -17,6 +18,7 @@ formula = lambda A, B, C, D, E: reduce(lambda x, y: x * y, [
     max(1 - D, E, B),
     max(1 - A, 1 - B),
     C,
+    max(1 - A, 1 - B),
     max(1 - A, 1 - B)
 ])
 
