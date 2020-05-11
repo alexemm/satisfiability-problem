@@ -4,10 +4,12 @@ This repo handles the problems inside of Mathematical Logics, specifically the S
 
 ## Implemented Solutions
 
-### Horn Formula marker algorithm
+## Propositional Calculus
+
+#### Horn Formula marker algorithm
 
 The marker algorithm for the P-complete problem HORN-SAT is implemented and provided here.
 
-### Resolution Calculus
+#### Resolution Calculus
 
 This algorithm helps deciding the unsatisfiability of a boolean formula in CNF.
